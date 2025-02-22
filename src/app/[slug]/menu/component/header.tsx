@@ -18,13 +18,13 @@ const RestaurantHeader = ({restaurant}: RestauranteHeaderProps) => {
     const handleBackClick= () => router.back()
     return ( 
         <div className="relative h-[250px] w-full">   
-                <Button variant="secondary" size="icon" className="absolute left-4 z-50 rounded-full" onClick={handleBackClick}>
+                <Button variant="secondary" size="icon" className="absolute left-4 z-50 rounded-full top-4" onClick={handleBackClick}>
                     <ChevronLeftIcon />
                 </Button>
                 <Image src={restaurant.coverImageUrl} alt={restaurant.coverImageUrl} fill className="object-cover"/>
                 {/* butão comprar */}
                  <div className="relative h-[250px] w-full">
-                    <Button variant="secondary" size="icon" className="absolute right-4 z-50 rounded-full">
+                    <Button variant="secondary" size="icon" className="absolute right-4 z-50 rounded-full top-4">
                         {/* <ChevronLeftIcon /> */}
                         <ScrollTextIcon/>
                     </Button>
