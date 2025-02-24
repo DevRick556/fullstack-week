@@ -7,7 +7,7 @@ import { Prisma, Product, Restaurant } from "@prisma/client";
 import {ChefHatIcon,ChevronLeftIcon,ChevronRightIcon,} from "lucide-react";
 import Image from "next/image";
 import { useContext, useState } from "react";
-import { CartContext } from "../../contexts/cart";
+import { CartContext, CartProduct } from "../../contexts/cart";
 
 import CartSheet from "./cart-sheet";
 
@@ -27,11 +27,11 @@ interface ProductsDetailsProps {
 
 const ProductDetails = ({ product }: ProductsDetailsProps) => {
   // usar para acessar meu contexto
-  const { toggleCart} = useContext(CartContext)
+  const { toggleCart, addProduct} = useContext(CartContext)
   // armazenar a quantidade de click no state
-  const [quantaty, setQuantaty] = useState<number>(1);
+  const [quantaty, setQuantity] = useState<number>(1);
   const handlerDecreaseQuantity = () => {
-    setQuantaty((prev) => {
+    setQuantity((prev) => {
       if (prev === 1) {
         return 1;
       }
@@ -40,12 +40,17 @@ const ProductDetails = ({ product }: ProductsDetailsProps) => {
     });
   };
   const handlerIncreaseQuantity = () => {
-    setQuantaty((prev) => prev + 1);
+    setQuantity((prev) => prev + 1);
   };
 
   // mandar pro onclick
   const handleAddToCard = () =>{
-    toggleCart()
+    const cartProduct: CartProduct = {
+      ...product,
+      quantaty,
+    };
+    addProduct(cartProduct);
+    toggleCart();
   }
 
   
