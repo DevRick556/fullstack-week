@@ -1,40 +1,53 @@
 "use client";
 
-import { CardContent } from "@/components/ui/card";
 import { Product } from "@prisma/client";
-import { Children, createContext, ReactNode, useState } from "react";
+import { createContext, ReactNode, useState } from "react";
 
-// passar o valor para a o produtp
-export interface CartProduct extends Pick<Product, "id" | "name" | "imageUrl"> {
-  quantaty: number;
+export interface CartProduct
+  extends Pick<Product, "id" | "name" | "price" | "imageUrl"> {
+  quantity: number;
 }
 
-export interface IcardContext {
+export interface ICartContext {
   isOpen: boolean;
   products: CartProduct[];
+  total: number;
+  totalQuantity: number;
   toggleCart: () => void;
-  addProduct: (product: CartProduct) => void; //esse void é q n vai retornar nd
+  addProduct: (product: CartProduct) => void;
+  decreaseProductQuantity: (productId: string) => void;
+  increaseProductQuantity: (productId: string) => void;
+  removeProduct: (productId: string) => void;
 }
 
-export const CartContext = createContext<IcardContext>({
+export const CartContext = createContext<ICartContext>({
   isOpen: false,
+  total: 0,
+  totalQuantity: 0,
   products: [],
   toggleCart: () => {},
   addProduct: () => {},
+  decreaseProductQuantity: () => {},
+  increaseProductQuantity: () => {},
+  removeProduct: () => {},
 });
 
-// terão acesso ao contexto,passar para todos q precisam usar esse contexto
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [products, setProducts] = useState<CartProduct[]>([]);
-  const [isOpen, setIsopen] = useState<boolean>(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
+  const total = products.reduce((acc, product) => {
+    return acc + product.price * product.quantity;
+  }, 0);
+  const totalQuantity = products.reduce((acc, product) => {
+    return acc + product.quantity;
+  }, 0);
   const toggleCart = () => {
-    setIsopen((prev) => !prev);
+    setIsOpen((prev) => !prev);
   };
-  //   função para add no carrinho
   const addProduct = (product: CartProduct) => {
     const productIsAlreadyOnTheCart = products.some(
-      (prevProduct) => prevProduct.id === product.id
+      (prevProduct) => prevProduct.id === product.id,
     );
     if (!productIsAlreadyOnTheCart) {
       return setProducts((prev) => [...prev, product]);
@@ -44,12 +57,40 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         if (prevProduct.id === product.id) {
           return {
             ...prevProduct,
-            quantaty: prevProduct.quantaty + product.quantaty,
+            quantity: prevProduct.quantity + product.quantity,
           };
         }
         return prevProduct;
       });
     });
+  };
+  const decreaseProductQuantity = (productId: string) => {
+    setProducts((prevProducts) => {
+      return prevProducts.map((prevProduct) => {
+        if (prevProduct.id !== productId) {
+          return prevProduct;
+        }
+        if (prevProduct.quantity === 1) {
+          return prevProduct;
+        }
+        return { ...prevProduct, quantity: prevProduct.quantity - 1 };
+      });
+    });
+  };
+  const increaseProductQuantity = (productId: string) => {
+    setProducts((prevProducts) => {
+      return prevProducts.map((prevProduct) => {
+        if (prevProduct.id !== productId) {
+          return prevProduct;
+        }
+        return { ...prevProduct, quantity: prevProduct.quantity + 1 };
+      });
+    });
+  };
+  const removeProduct = (productId: string) => {
+    setProducts((prevProducts) =>
+      prevProducts.filter((prevProduct) => prevProduct.id !== productId),
+    );
   };
   return (
     <CartContext.Provider
@@ -58,6 +99,11 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         products,
         toggleCart,
         addProduct,
+        decreaseProductQuantity,
+        increaseProductQuantity,
+        removeProduct,
+        total,
+        totalQuantity,
       }}
     >
       {children}

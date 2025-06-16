@@ -13,7 +13,7 @@ const RestaurantePage = async ({ params }: RestaurantePageProps) => {
   const restaurant = await getRestaurantBySlug(slug);
   if (!restaurant) {
     return notFound();
-  } //se eu n estanciar nenhum restaurante, ele vai retornar um 404
+  } //se eu n instanciar nenhum restaurante, ele vai retornar um 404
 
   return (
     <div className="h-screen flex flex-col items-center justify-center px-6 pt-24">
